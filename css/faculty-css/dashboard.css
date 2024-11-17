@@ -1,3 +1,4 @@
+
 :root {
     --header-height: 3rem;
     --nav-width: 68px;
@@ -30,7 +31,9 @@ a {
     padding: 0 1rem;
     background-color: #ffff;
     z-index: var(--z-fixed);
-
+    -webkit-box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.21);
+    -moz-box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.21);
+    box-shadow: 0px 1px 5px 1px rgba(0,0,0,0.21);
 }
 
 .header_toggle {
@@ -56,7 +59,7 @@ a {
     position: fixed;
     top: 0;
     left: -30%;
-    width: var(--nav-width);
+    width: var(--nav-width) ;
     height: 100vh;
     background-color: #B0D9B1;
     padding: .5rem 1rem 0 0;
@@ -147,8 +150,12 @@ a {
     -webkit-box-shadow: 0px 0px 3px 1px rgba(127, 127, 127, 0.7);
     -moz-box-shadow: 0px 0px 3px 1px rgba(127, 127, 127, 0.7);
 }
+.logo-img {
+    display: none; /* Hide the image by default */
+}
 
 @media screen and (min-width: 768px) {
+
     body {
         margin: calc(var(--header-height) + 1rem) 0 0 0;
         padding-left: calc(var(--nav-width) + 2rem);
@@ -174,11 +181,11 @@ a {
     }
 
     .show {
-        width: calc(var(--nav-width) + 156px);
+        width: calc(var(--nav-width) + 152px);
     }
 
     .body-pd {
-        padding-left: calc(var(--nav-width) + 188px);
+        padding-left: calc(var(--nav-width) + 152px);
     }
     .form-control{
         width: 100%;
@@ -235,6 +242,11 @@ a {
         background-color: rgba(0, 0, 0, 0.5);
         z-index: 1040; /* Ensure backdrop is below modal but above other content */
     }
+    .dropdown img {
+        width: 35px; /* Adjusted width for mobile view */
+        height: 35px; /* Adjusted height for mobile view */
+    }
+
 }
 #sidebarshow {
     display: none;
@@ -285,7 +297,9 @@ span {
     -moz-box-shadow: 0px 0px 3px 1px rgba(127, 127, 127, 0.7);
 }
 
-#viewToggleButton {
+#viewToggle
+
+{
     font-size: 13px;
     padding: 6px;
     border-radius: 8px;
@@ -299,9 +313,19 @@ span {
     border-radius: 12px;
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width: 576px) {
     * {
         font-size: 12px;
+    }
+    :root{
+        --nav-width: 60px;
+    }
+    .l-navbar {
+        width: var(--nav-width);
+    }
+
+    .l-navbar.nav-minimized {
+        width: var(--nav-width);
     }
 
     #sidebarshow {
@@ -346,30 +370,25 @@ span {
     }
 
     .header-text, .mobile-image-container, .dropdown {
-        margin: 0 5px; /* Add some spacing between elements */
+        margin: 0 5px;
     }
 
     .mobile-image-container {
-        display: flex; /* Use flexbox to center the image */
-        justify-content: center; /* Center the image horizontally */
-        align-items: center; /* Center the image vertically */
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 
-    .mobile-image {
-        max-width: 50px; /* Adjust as needed */
-        height: auto; /* Maintain aspect ratio */
+    .dropdown img {
+        width: 25px;
+        height: 25px;
     }
-
-    .dropdown-toggle {
-        max-width: 50px; /* Adjust as needed */
-    }
-
     .navbar {
         background-color: #B0D9B1;
     }
 
     .text-head {
-        display: block; /* Show the text-head on mobile view */
+        display: block;
         font-size: 18px;
         color: #119e0e;
         font-family: 'Baloo Paaji 2', cursive;
@@ -403,37 +422,128 @@ span {
     .tablefaculty td:nth-child(5) {
         display: none;
     }
-    .tablefaculty {
-        display: flex;
-        flex-direction: column;
+
+    .logo-img {
+        display: inline-block; 
+    }
+    .table-responsive {
+        overflow-x: auto;
+        white-space: auto;
     }
 
-
-    .tablefaculty tr {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        border: 1px solid #ddd;
-        margin-bottom: 0.5rem;
-        padding: 0.5rem;
+    .table-responsive table {
+        width: 100%;
+        min-width: 100%;
     }
 
-    .tablefaculty td, .tablefaculty th {
-        width: 50% !important;
+    .table-responsive th,
+    .table-responsive td {
+        min-width: 1px;
     }
+    .sched-table{
+        padding: 0 !important;
+    }
+
 
 }
 
 /* Hide the image and text-head by default */
 
-@media screen and (min-width: 768px) {
+@media screen and (max-width: 768px) {
+
     .mobile-image-container {
         display: none;
     }
 
+
     .text-head {
         display: none;
     }
+    *{
+        font-size: 12px;
+    }
 
+}
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(15px);
+    z-index: 9999;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.1s linear;
+}
 
+.loading-screen.visible {
+    visibility: visible;
+    opacity: 1;
+}
+
+.loading-screen svg {
+    font-family: "Poppins", sans-serif;
+    width: 100%;
+    height: 100%;
+}
+
+.loading-screen svg text {
+    font-size: 60px;
+    animation: stroke 5s infinite alternate;
+    stroke-width: 2;
+    stroke: #7BB883;
+    text-anchor: middle;
+}
+
+@keyframes stroke {
+    0% {
+        fill: rgba(176, 217, 177, 0);
+        stroke: rgba(123, 184, 131, 1);
+        stroke-dashoffset: 25%;
+        stroke-dasharray: 0 50%;
+        stroke-width: 2;
+    }
+    70% {
+        fill: rgba(176, 217, 177, 0);
+        stroke: rgba(123, 184, 131, 1);
+    }
+    80% {
+        fill: rgba(176, 217, 177, 0);
+        stroke: rgba(123, 184, 131, 1);
+        stroke-width: 3;
+    }
+    100% {
+        fill: rgba(176, 217, 177, 1);
+        stroke: rgba(123, 184, 131, 0);
+        stroke-dashoffset: -25%;
+        stroke-dasharray: 50% 0;
+        stroke-width: 0;
+    }
+}
+
+@media screen and (max-width: 768px) {
+
+    *{
+        font-size:13px ;
+
+    }
+    .step{
+        font-size: 10px;
+    }
+    .step-label{
+        font-size: 8px;
+    }
+    .logo-display img{
+        height: 120px;
+        width: 120px;
+    }
+
+}
+.btn.remove-subject{
+    padding: 4px;
+    width: auto;
 }

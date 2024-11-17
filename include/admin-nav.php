@@ -1,4 +1,12 @@
-<?php session_start();?>
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if ($_SESSION['role'] != 'Admin') {
+    header("Location: ../index.php");
+    exit();
+}?>
 
 <body id="body-pd">
     <header class="header" id="header">
@@ -10,8 +18,13 @@
             <div class="dropdown">
                 <img src="../img/icons/user.png" width="40" height="40" alt="" class="dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item" href="../SuperAdmin/profile.php">Profile</a></li>
-                    <li><a class="dropdown-item" href="#">Logout</a></li>
+                   
+                    <li><form action="../processing/facultyprocessing.php" method="POST" style="display: inline;">
+                            <input type="text" name="action" value="logout" hidden>
+                            <button type="submit" name="logout" class="dropdown-item px-3" style="background: none; border: none; padding: 0; margin: 0;">
+                                Logout
+                            </button>
+                        </form></li>
                 </ul>
             </div>
         </div>
@@ -23,16 +36,16 @@
                     <img src="../img/logo/Sched-logo1.png" width="100">
                 </a>
                 <div class="nav_list">
-                <a href="../SuperAdmin/landing.php" class="nav_link active">
+                <a href="../SuperAdmin/landing.php" class="nav_link <?php if ($_SESSION['currentpage']=='dashboard'){ echo 'active'; }?>">
                     <img src="../img/icons/dashboard.png" alt="" width="24">
                         <span class="nav_name">Dashboard</span>
                     </a>
-                    <a href="../SuperAdmin/users.php" class="nav_link active">
+                    <a href="../SuperAdmin/users.php" class="nav_link <?php if ($_SESSION['currentpage']=='user'){ echo 'active'; }?>">
                     <img src="../img/icons/faculty.png" alt="" width="24">
                         <span class="nav_name">Users</span>
                     </a>
                     </a>
-                    <a href="../SuperAdmin/colleges.php" class="nav_link">
+                    <a href="../SuperAdmin/colleges.php" class="nav_link <?php if ($_SESSION['currentpage']=='colleges'){ echo 'active'; }?>">
                     <img src="../img/icons/home.png" alt="" width="24">
                         <span class="nav_name">Colleges</span>
                     </a>

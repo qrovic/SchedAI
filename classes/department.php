@@ -30,7 +30,7 @@ class Department {
     }
     
     public function getcollegedepartment($collegeid) {
-        $sql = "SELECT * FROM department WHERE collegeid = :collegeid";
+        $sql = "SELECT * FROM department WHERE collegeid = :collegeid ORDER BY yearlvl DESC";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':collegeid' => $collegeid]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC); 
@@ -50,13 +50,15 @@ class Department {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     
-    public function updatedepartment($id, $name, $capacity) {
-        $sql = "UPDATE rooms SET name = :name, capacity = :capacity WHERE id = :id";
+    
+    public function editdepartment($departmentid, $departmentname, $abbreviation, $yearlvl){
+        $sql = "UPDATE department SET name = :name, abbreviation = :abbreviation, yearlvl=:yearlvl  WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         return $stmt->execute([
-            ':name' => $name,
-            ':capacity' => $capacity,
-            ':id' => $id
+            ':abbreviation' => $abbreviation,
+            ':yearlvl' => $yearlvl,
+            ':name' => $departmentname,
+            ':id' => $departmentid
         ]);
     }
 

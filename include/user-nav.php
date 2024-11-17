@@ -1,4 +1,9 @@
-<?php session_start();?>
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
 <body id="body-pd">
     <header class="header " id="header">
             <div class="row">
@@ -13,7 +18,7 @@
             <div class="dropdown">
                 <img src="../img/icons/user.png" width="20" height="20" alt="" class="dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <ul class="dropdown-menu" aria-labelledby="userDropdown">
-                    <li><a class="dropdown-item" href="../faculty/dashboard.php">Profile</a></li>
+                    <li><a class="dropdown-item" href="javascript:history.back()">Profile</a></li>
                     <li>
                         <form action="../processing/facultyprocessing.php" method="POST" style="display: inline;">
                             <input type="text" name="action" value="logout" hidden>

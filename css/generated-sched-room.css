@@ -87,10 +87,7 @@
     border: none;
 }
 
-.header-table button:hover {
-    border: 1px solid #1A5319;
-    border-radius: 15px;
-}
+
 
 table {
     width: 100%;
@@ -157,10 +154,10 @@ td {
     min-width: 95% !important;
 }
 
-@media screen and (max-width: 575px) {
+@media screen and (max-width: 576px) {
     .table-responsive {
         overflow-x: auto;
-        white-space: nowrap;
+        white-space: none;
     }
 
     .table-responsive table {

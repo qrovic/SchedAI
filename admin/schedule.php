@@ -2,6 +2,10 @@
 <html lang="en">
 <?php
     require_once('../include/head.php');
+    $_SESSION['currentpage']='schedule';
+    if (!isset($_GET['curriculum'])){
+        $_SESSION['loading']=1;
+    }
 ?>
 
 <body>
@@ -11,27 +15,27 @@
         require_once('../classes/curriculum.php');
         require_once('../classes/department.php');
         require_once('../classes/college.php');
-        
-        
+
+
         $collegeid=$_SESSION['collegeid'];
-        
+
         $db = new Database();
         $pdo = $db->connect();
 
         $curriculum = new Curriculum($pdo);
         $college = new College($pdo);
         $department = new Department($pdo);
-        
+
         if ($_SESSION['scheduling']=='college'){
             $_SESSION['departmentid']=0;
         }else{
             $_SESSION['departmentid']=$_SESSION['departmentid'];
         }
-        
+
         /*$calendardistinct = $curriculum->getdistinctcurriculumsschedule();
         $calendardistinctall = $curriculum->getdistinctcurriculumsscheduleall();*/
-        
-       
+
+
         if(isset($_POST['departmentid'])){
             $departmentid = $_POST['departmentid'];
             $_SESSION['departmentidbasis']=$departmentid;
@@ -42,7 +46,7 @@
             $departmentid=0;
             $_SESSION['departmentidbasis']=0;
         }
-        
+
         if($_SESSION['departmentid']!=0){
             $collegedepartment = $department->getcollegedepartment($collegeid);
             $calendar = $curriculum->getcollegecalendar($_SESSION['collegeid']);
@@ -54,15 +58,15 @@
             $collegeinfo=$college->getcollegeinfo($collegeid);
             $initialcollegedepartment = $department->getinitialcollegedepartment($collegeid);
         }
-        
+
     ?>
     <main>
         <div class="container mb-1">
             <div class="row d-flex align-items-center">
-                <div class="col-5">
+                <div class="col-6">
                     <h3><?php if ($departmentid!=0){echo $departmentinfo['abbreviation']; }else{ echo $collegeinfo['abbreviation'];}?> Academic Schedules</h3>
                 </div>
-                <div class="col-3">
+                <div class="col-3 ">
                     <form class="mb-0" action="schedule.php" method="POST" >
                         <select class="form-select form-select-sm" id="select-classtype" name="departmentid" onchange="this.form.submit()" <?php if ($_POST['departmentidbasis']!=0 && $_SESSION['scheduling']=='college'){echo 'disabled';} ?>>
                             <?php foreach ($collegedepartment as $collegedepartments){?>
@@ -73,12 +77,10 @@
                         </select>
                     </form>
                 </div>
-                <div class="col-1">
-                    <select class="form-select form-select-sm" id="select-classtype">
-                        <option>all</option>
-                        <option>lec</option>
-                        <option>lab</option>
-                    </select>
+
+                <div class="col-2 d-flex align-items-center justify-content-start">
+                        <button class="button-modal " data-bs-toggle="modal" data-bs-target="#formaddcalendar"><img src="../img/icons/add-icon.png" alt=""></button>
+                        </div>
                 </div>
                 <!--<div class="col-2 d-flex justify-content-end">
                     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#formModal">Generate</button>
@@ -111,21 +113,149 @@
                                 $displayyear = '';
                             }
                         ?>
-                            <tr onclick="submitForm('<?php echo htmlspecialchars($calendars['year']); ?>', '<?php echo htmlspecialchars($calendars['sem']); ?>', '<?php echo htmlspecialchars($calendars['calendarid']); ?>')">
+                            <tr class="hover-row" onclick="submitForm('<?php echo htmlspecialchars($calendars['year']); ?>', '<?php echo htmlspecialchars($calendars['sem']); ?>', '<?php echo htmlspecialchars($calendars['calendarid']); ?>', event)">
                                 <th scope="row"><?php echo htmlspecialchars($displayyear); ?></th>
                                 <td><?php echo htmlspecialchars($calendars['sem'] == 1 ? '1st Semester' : ($calendars['sem'] == 2 ? '2nd Semester' : ($calendars['sem'] == 3 ? '3rd Semester' : $calendars['sem'] . 'th'))); ?></td>
 
                                 <td>
-                                    <div class="actions">
+
+                                    <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#formeditcalendar<?php echo $calendars['id']; ?>" onclick="event.stopPropagation();" style="background: none; border: none; padding: 0;">
                                         <i class="fas fa-edit"></i>
-                                        <i class="fas fa-trash"></i>
-                                        <i class="fas fa-eye"></i>
-                                    </div>
+                                    </button>
+
+
+                                    <form action="../processing/curriculumprocessing.php" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this curriculum?');">
+                                        <input type="hidden" name="action" value="deletecalendar">
+                                        <input type="hidden" name="id" value="<?php echo $calendars['id']; ?>">
+                                        <button type="submit" class="btn" onclick="event.stopPropagation();" style="background: none; border: none; padding: 0;">
+                                            <i class="fas fa-trash-alt"></i> 
+                                        </button>
+                                    </form>
+
                                 </td>
                             </tr>
+
+                             <!--Modal edit year-->
+                            <div class="modal fade" id="formeditcalendar<?php echo $calendars['id']; ?>" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-lg mt-6" role="document">
+                                    <div class="modal-content border-0">
+                                        <div class="modal-header border-0">
+                                            <h4 class="modal-title" id="formModalLabel">Edit School Year</h4>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body px-5">
+                                            <form action="../processing/curriculumprocessing.php" method="POST">
+                                                <input type="text" value="editcalendar" name="action" hidden>
+                                                <input type="hidden" value="1" name="schedule">
+                                                <input type="hidden" value="<?php echo $calendars['id'];?>" name="calendarid">
+                                                <div class="row">
+                                                    <div class="form-group col-md-6">
+                                                        <label for="startyear">Enter Year</label>
+                                                        <div class="input-group mt-2">
+                                                            <input type="number" name="academicyear" id="startyear1<?php echo $calendars['id']; ?>" class="form-control form-control-sm" style="width: 120px;"  value="<?php echo $calendars['year']; ?>">
+                                                            <span class="input-group-text">-</span>
+                                                            <input type="number" name="endyear" id="endyear1<?php echo $calendars['id']; ?>" class="form-control form-control-sm" style="width: 120px;"  value="<?php echo ($calendars['year']+1); ?>">
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="select-semester">Select Semester</label>
+                                                        <select name="semester" class="form-select form-select-sm mt-2" id="select-semester">
+                                                            <option value="1" <?php if ($calendars['sem'] == 1){ echo 'selected';}?>>First Semester</option>
+                                                            <option value="2" <?php if ($calendars['sem'] == 2){ echo 'selected';}?>>Second Semester</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer d-flex justify-content-between">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-success">Done</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         <?php } ?>
                     </tbody>
                 </table>
+            </div>
+        </div>
+        <!-- Modal Form add calendar -->
+        <div class="modal fade" id="formaddcalendar" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg mt-6" role="document">
+            <div class="modal-content border-0">
+                <div class="modal-header border-0">
+                    <h4 class="modal-title" id="formModalLabel">Add New School Year</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body px-5">
+                    <form action="../processing/curriculumprocessing.php" method="POST">
+                        <input type="text" value="addcalendar" name="action" hidden>
+                        <input type="hidden" value="<?php echo $collegeid;?>" name="collegeid" >
+                        <input type="hidden" value="0" name="curriculumplan" >
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="startyear">Enter Year</label>
+                                <div class="input-group mt-2">
+                                    <input type="number" name="academicyear" id="startyear" class="form-control form-control-sm" style="width: 120px;">
+                                    <span class="input-group-text">-</span>
+                                    <input type="number" name="endyear" id="endyear" class="form-control form-control-sm" style="width: 120px;">
+                                </div>
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label for="select-semester">Select Semester</label>
+                                <div class="input-group mt-2">
+
+                                    <select name="semester" class="form-select form-select-sm mt-2" id="select-semester">
+                                        <option value="1">First Semester</option>
+                                        <option value="2">Second Semester</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+
+                            </div>
+
+                        </div>
+                        <div class="modal-footer d-flex justify-content-between">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">Done</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="formeditcalendar" tabindex="-1" aria-labelledby="formModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg mt-6" role="document">
+                <div class="modal-content border-0">
+                    <div class="modal-header border-0">
+                        <h4 class="modal-title" id="formModalLabel">Edit School Year</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body px-5">
+                        <form action="../processing/curriculumprocessing.php" method="POST">
+                            <input type="text" value="editcalendar" name="action" hidden>
+                            <input type="hidden" value="<?php echo $collegeid;?>" name="collegeid">
+                            <input type="hidden" value="0" name="curriculumplan">
+                            <div class="row">
+                                <div class="form-group col-md-6">
+                                    <label for="startyear">Enter Year</label>
+                                    <div class="input-group mt-2">
+                                        <input type="number" name="academicyear" id="startyear" class="form-control form-control-sm" style="width: 120px;">
+                                        <span class="input-group-text">-</span>
+                                        <input type="number" name="endyear" id="endyear" class="form-control form-control-sm" style="width: 120px;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer d-flex justify-content-between">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-success">Done</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -138,7 +268,7 @@
                     </div>
                     <div class="modal-body p-3">
                         <form id="formModalForm" action="../processing/scheduleprocessing.php"  method="post">
-                            
+
                             <div class="rounded-top-3 bg-body-tertiary p-2">
                                 <h2 class="head-label">Generate New Schedule</h2>
                                 <div class="container mt-4">
@@ -147,10 +277,10 @@
                                             <div class="form-group academic-year">
                                                 <h5>Select Academic Year</h5>
                                                 <select name="academicyear" id="">
-                                                    <?php  
+                                                    <?php
                                                         foreach ($calendardistinctall as $calendardistinctsall) {?>
                                                             <option value="<?php echo $calendardistinctsall['year'];?>"><?php echo $calendardistinctsall['name'];?></option>
-                                                                
+
                                                             <?php
                                                         }
                                                     ?>
@@ -164,7 +294,7 @@
                                                     <?php foreach ($collegedepartment as $collegedepartments){?>
                                                         <option <?php if ($_SESSION['departmentid']==$collegedepartments['id']){echo 'selected';}?> value="<?php echo $collegedepartments['id'];?>" ><?php echo $collegedepartments['name'];?></option>
                                                     <?php } ?>
-                                                    
+
                                                     <option value="" >Choose a department</option>
                                                 </select>
                                             </div>
@@ -206,7 +336,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        
+
                                                                 <?php for ($i=1; $i<=$departmentinfo['yearlvl']; $i++){ ?>
                                                                     <tr>
                                                                         <td style="border: none;">Year Level <?php echo $i;?></td>
@@ -215,10 +345,10 @@
                                                                         </td>
                                                                         <td style="border: none;">
                                                                             <select class="form-select form-select-sm m-0" name="curriculum1">
-                                                                                <?php 
+                                                                                <?php
                                                                                 foreach ($calendardistinct as $calendardistincts) {?>
                                                                                 <option value="<?php echo $calendardistincts['year'];?>"><?php echo $calendardistincts['name'];?></option>
-                                                                                    
+
                                                                                 <?php
                                                                                 }
                                                                                 ?>
@@ -226,23 +356,23 @@
                                                                         </td>
                                                                     </tr>
                                                                 <?php } ?>
-                                                        
-                                                        
+
+
                                                     </tbody>
                                                 </table>
                                             </div>
                                         </div>
                                     <?php } ?>
-                                  
+
                                     <?php if($_SESSION['departmentid']==0){ ?>
                                         <input type="hidden" name="action" value="addcollege">
                                         <div class="form-group num-of-section">
                                             <div class="row">
                                                 <h5>Student Sections</h5>
-                                                <?php foreach($collegedepartment AS $collegedepartments){  
+                                                <?php foreach($collegedepartment AS $collegedepartments){
                                                 echo $collegedepartments['abbreviation'];?>
-                                                <input type="number" name="departmentid[]" id="" value="<?php echo $collegedepartments['id'];?>">    
-                                                
+                                                <input type="number" name="departmentid[]" id="" value="<?php echo $collegedepartments['id'];?>">
+
                                                     <table class="table mx-2">
                                                         <thead>
                                                             <tr>
@@ -261,10 +391,10 @@
                                                                     </td>
                                                                     <td style="border: none;">
                                                                         <select class="form-select form-select-sm m-0" name="curriculum<?php echo $i;?>[]">
-                                                                            <?php 
+                                                                            <?php
                                                                             foreach ($calendardistinct as $calendardistincts) {?>
                                                                             <option value="<?php echo $calendardistincts['year'];?>"><?php echo $calendardistincts['name'];?></option>
-                                                                                
+
                                                                             <?php
                                                                             }
                                                                             ?>
@@ -272,10 +402,10 @@
                                                                     </td>
                                                                 </tr>
                                                             <?php } ?>
-                                                
-                                                        
-                                                        
-                                                            
+
+
+
+
                                                         </tbody>
                                                     </table>
                                                <?php } ?>
@@ -360,14 +490,73 @@
 <link rel="stylesheet" href="../css/sched.css">
 <script src="../js/schedule.js"></script>
 <script>
-    function submitForm(year, sem, calendarid) {
+        const startYearInput = document.getElementById('startyear');
+        const endYearInput = document.getElementById('endyear');
+
+        startYearInput.addEventListener('input', function() {
+            const startYear = parseInt(startYearInput.value);
+            if (!isNaN(startYear)) {
+                endYearInput.value = startYear + 1;
+            }
+        });
+        endYearInput.addEventListener('input', function() {
+            const endYear = parseInt(endYearInput.value);
+            if (!isNaN(endYear)) {
+                startYearInput.value = endYear - 1;
+            }
+        });
+    </script>
+    <script>
+
+    function updateYearFields(calendarId) {
+        const startYearInput = document.getElementById('startyear1' + calendarId);
+        const endYearInput = document.getElementById('endyear1' + calendarId);
+
+        if (startYearInput && endYearInput) {
+            startYearInput.addEventListener('input', function() {
+                const startYear = parseInt(startYearInput.value);
+                if (!isNaN(startYear)) {
+                    endYearInput.value = startYear + 1;
+                }
+            });
+
+
+            endYearInput.addEventListener('input', function() {
+                const endYear = parseInt(endYearInput.value);
+                if (!isNaN(endYear)) {
+                    startYearInput.value = endYear - 1;
+                }
+            });
+        }
+    }
+
+    function setupModalListener(calendarId) {
+        const modalElement = document.getElementById('formeditcalendar' + calendarId);
+
+        if (modalElement) {
+            modalElement.addEventListener('show.bs.modal', function() {
+                updateYearFields(calendarId);
+            });
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        <?php foreach ($calendar as $cal) { ?>
+            setupModalListener('<?php echo $cal['id']; ?>');
+        <?php } ?>
+    });
+    </script>
+<script>
+    function submitForm(year, sem, calendarid, event) {
+        if (event) {
+            event.stopPropagation();
+        }
         document.getElementById('year-field').value = year;
         document.getElementById('sem-field').value = sem;
         document.getElementById('calendarid-field').value = calendarid;
         document.getElementById('schedule-form').submit();
     }
     document.querySelector('.btn-close').addEventListener('click', function() {
-    console.log('Modal is being closed');
 });
 </script>
 <?php

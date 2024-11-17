@@ -106,6 +106,13 @@ class Faculty {
         $stmt->bindParam(':endtime', $endtime);
         return $stmt->execute();
     }
+    public function setfacultyactive($facultyid, $active){
+        $sql = "UPDATE faculty SET active = :active WHERE id = :facultyid";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':facultyid', $facultyid);
+        $stmt->bindParam(':active', $active);
+        return $stmt->execute();
+    }
     public function deletetimepreference($facultyid, $day){
         $sql = "DELETE FROM facultypreferences WHERE facultyid =:facultyid AND day=:day";
         $stmt = $this->pdo->prepare($sql);
@@ -113,15 +120,15 @@ class Faculty {
         $stmt->bindParam(':day', $day);
         return $stmt->execute();
     }
-    public function editfacultyinfo($fname, $lname, $mname, $contactno, $bday, $gender, $type, $startdate, $teachinghours, $highestdegree, $facultyid) {
-        $sql = "UPDATE faculty SET fname = :fname, lname = :lname, mname = :mname, contactno = :contactno, bday = :bday, gender = :gender, type = :type, startdate = :startdate, teachinghours = :teachinghours, rank = :rank WHERE id = :facultyid";
+    public function editfacultyinfo($fname, $lname, $mname, $contactno, $email, $gender, $type, $startdate, $teachinghours, $highestdegree, $facultyid) {
+        $sql = "UPDATE faculty SET fname = :fname, lname = :lname, mname = :mname, contactno = :contactno, email = :email, gender = :gender, type = :type, startdate = :startdate, teachinghours = :teachinghours, rank = :rank WHERE id = :facultyid";
         $stmt = $this->pdo->prepare($sql);
     
         $stmt->bindParam(':fname', $fname);
         $stmt->bindParam(':lname', $lname);
         $stmt->bindParam(':mname', $mname);
         $stmt->bindParam(':contactno', $contactno);
-        $stmt->bindParam(':bday', $bday);
+        $stmt->bindParam(':email', $email);
         $stmt->bindParam(':gender', $gender);
         $stmt->bindParam(':type', $type);
         $stmt->bindParam(':startdate', $startdate);
@@ -183,7 +190,7 @@ class Faculty {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
     public function getallfacultycollege($collegeid) {
-        $sql = "SELECT *, faculty.id AS facultyid, department.name AS departmentname 
+        $sql = "SELECT *, faculty.id AS facultyid, department.name AS departmentname, CONCAT(faculty.fname, ' ', faculty.lname) AS facultyname
                 FROM faculty 
                 JOIN department ON department.id = faculty.departmentid 
                 WHERE department.collegeid = :collegeid";
@@ -192,6 +199,13 @@ class Faculty {
         $stmt->execute(['collegeid' => $collegeid]);
         
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function getinitialcollegefaculty($collegeid) {
+        $sql = "SELECT id FROM faculty WHERE collegeid = :collegeid LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':collegeid' => $collegeid]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result ? $result['id'] : null;
     }
     public function facultywemailcollege($collegeid) {
         $sql = "SELECT *, faculty.id AS facultyid, department.name AS departmentname 

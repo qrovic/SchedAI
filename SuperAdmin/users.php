@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
+        
         require_once('../include/head.php');
+        $_SESSION['currentpage']='user';
         require_once('../include/admin-nav.php');
 
         require_once('../classes/db.php');
@@ -12,7 +14,7 @@
         require_once('../classes/faculty.php');
         require_once('../classes/email.php');
         
-        $collegeid=$_SESSION['collegeid'];
+            
         $scheduling=False;
         $db = new Database();
         $pdo = $db->connect();

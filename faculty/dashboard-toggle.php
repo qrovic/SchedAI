@@ -96,9 +96,10 @@
             $yearlvl = htmlspecialchars($row['yearlvl']);
             $section = htmlspecialchars($row['section']);
             $roomname = htmlspecialchars($row['roomname']);
+            $departmentname = htmlspecialchars($row['departmentname']);
 
 
-            $subjectLabel = "$subjectname $yearlvl$section ($roomname)";
+            $subjectLabel = "$subjectname $departmentname $yearlvl$section ($roomname)";
             $color = generateColor($subjectid);
 
 
@@ -154,7 +155,7 @@
 <main>
 
     <div class="container containersched p-4">
-   
+
         <div class="row d-flex justify-content-end align-items-center">
             <div class="col-12 col-md-6">
                 <h5>
@@ -191,7 +192,7 @@
         </a>
     </div>
 
-    <div class="sched-table mt-3">
+    <div class="sched-table mt-3" id="pageContent">
         <div id="tabularView" class="mt-2">
             <div class="table-responsive">
                 <table class="table tablesched">
@@ -256,14 +257,114 @@
 </div>
 </div>
     </div>
+    <div id="rotateMessage" style="display: none;">
+    Please rotate your device to view full schedule.
+</div>
+
 </main>
+<style>
+    #pageContent {
+    transition: filter 0.3s ease;
+}
+
+#pageContent.blurred {
+    filter: blur(5px);
+}
+
+#rotateMessage {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+    text-align: center;
+    z-index: 1000;
+    font-size: 1.2em;
+    max-width: 80%;
+}
+.sched-table {
+    transition: all 0.3s ease;
+}
+
+.fullscreen-table {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: white;
+    overflow-y: auto;
+    z-index: 999;
+    margin-top: 0 !important;
+}
+
+.tablesched {
+    width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .tablesched {
+        font-size: 0.7rem;
+    }
+}
+
+
+
+</style>
 <link rel="stylesheet" href="../css/generated-sched-room.css">
-<link rel="stylesheet" href="../css/main.css">
+<link rel="stylesheet" href="../css/faculty-css/dashboard.css">
+
 
     <script src="../js/facultyloading.js"></script>
     <?php
         require_once('../include/js.php')
     ?>
+    <script>
+    function checkOrientation() {
+    const rotateMessage = document.getElementById('rotateMessage');
+    const pageContent = document.getElementById('pageContent');
+
+    if (window.innerHeight > window.innerWidth) {
+
+        rotateMessage.style.display = 'block';
+        pageContent.classList.add('blurred');
+    } else {
+
+        rotateMessage.style.display = 'none';
+        pageContent.classList.remove('blurred');
+    }
+}
+
+checkOrientation();
+
+window.addEventListener('resize', checkOrientation);
+</script>
+<script>
+    function toggleFullScreenTable() {
+    const tableContainer = document.getElementById('pageContent');
+
+    if (window.innerWidth <= 768) {
+        if (window.innerWidth > window.innerHeight) {
+            tableContainer.classList.add('fullscreen-table');
+        } else {
+            tableContainer.classList.remove('fullscreen-table');
+        }
+    } else {
+        tableContainer.classList.remove('fullscreen-table');
+    }
+}
+
+toggleFullScreenTable();
+
+window.addEventListener('resize', toggleFullScreenTable);
+
+
+
+</script>
 </html>
 
 

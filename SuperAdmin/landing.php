@@ -2,6 +2,7 @@
 <html lang="en">
 <?php
         require_once('../include/head.php');
+        $_SESSION['currentpage']='dashboard';
     ?>
 
 <body>
@@ -26,7 +27,7 @@
 <div class="container dashboard">
         <div class="row">
             <div class="text d-flex align-items-center">
-                <h2>Hola !!!</h2> <span>Role</span>
+                <h2>Hola !!!</h2> <span>Admin</span>
             </div>
         </div>
         <div class="container mt-2 ">
@@ -55,7 +56,7 @@
                     <div class="card">
                         <div class="card-body">
                             <h5 class="card-title">Colleges with Schedules</h5>
-                            <p class="card-text">85</p>
+                            <p class="card-text">4</p>
                         </div>
                     </div>
                 </div>

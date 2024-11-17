@@ -27,5 +27,48 @@ profiling: faculty side
     -edit
     -dashboard
 
+----------------------------------------------
+Curriculum
+    - edit done
+
+Pages
+    - current page done
+
+Edit profile 
+    - email done
+
+    
+user
+    - add active or not done
+
+Room 
+    - remove year level done
+    - time  done
+    - edit done
+
+Superadmin
+    - edit college done
+    - edit user
+    - edt department done
+
+schedule
+    - add by faculty
+    
 Algorithm
-    -fallback mechanism
+    - fallback mechanism
+    - track student section done
+    - add virtual faculty
+    - add virtual room
+    - fixed gap
+All
+    - validations
+
+
+Lab
+    - if requiredroom 1 then check for time up if =>6, if not then check below if sectionfree,facultyfree,if roomfree, if all free then move down leaving the up 3 hours, if not free then timestart=timestart
+    - check also down if 30 minutes only or 3 hours+30, go down leaving no minutes below
+3.0 Lec
+    = check if above is 30 minutes then check if possible to move down to leave up 1.5 hour sectionfree,facultyfree,if roomfree, if not then leave 1 hour, if still not, then stay as is
+
+Lec 2.0
+    - check if 
